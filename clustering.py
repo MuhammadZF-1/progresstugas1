@@ -15,6 +15,7 @@ datatrain=pd.read_csv('kendaraan_train.csv')
 # #print(data.info())
 a=datatrain.isnull().sum()
 print(a)
+print("hai")
 # data=data.drop_duplicates() #drop data duplikasi karena bisa mengganggu proses
 # #print(data)
 # def encoding(dataenc):

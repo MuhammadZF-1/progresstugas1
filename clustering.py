@@ -6,57 +6,54 @@ from sklearn.preprocessing import StandardScaler
 
 
 datatrain=pd.read_csv('kendaraan_train.csv')
-#print(data.info())
-# data.drop(['id','Tertarik'],axis=1,inplace=True)
-#print(datatrain.iloc[:5,5:12])
-# # print("total dataset ",len(data))
-# # data.sample(5)
+#print(datatrain.info()) #untuk mengecek info dalam file yang berisi kolom dan tipenya
+#print(datatrain.describe()) #untuk cek mean,mode, min, max dalam data
+#print(datatrain.iloc[:5,:6]) #melihat isi baris 0-4 dengan 6 kolom dari kiri
+#print(datatrain.iloc[:5,5:]) #melihat isi baris 0-4 dengan kolom ke-6 sampai akhir
 
-# #print(data.info())
-a=datatrain.isnull().sum()
-print(a)
-print("hai")
-# data=data.drop_duplicates() #drop data duplikasi karena bisa mengganggu proses
-# #print(data)
-# def encoding(dataenc):
-#     dataenc['Jenis_Kelamin']=dataenc['Jenis_Kelamin'].replace(['Pria','Wanita'],[1,0])
-#     dataenc['Umur_Kendaraan']=dataenc['Umur_Kendaraan'].replace(['< 1 Tahun','1-2 Tahun','> 2 Tahun'],[0,1,2])
-#     dataenc['Kendaraan_Rusak']=dataenc['Kendaraan_Rusak'].replace(['Tidak','Pernah'],[0,1])   
-# encoding(data)
-# #print(data.isna().sum())       #cek ada berapa data yang null
-# #print(data.skew())             #cek skewness masing2 kolom
-# data['SIM']=data['SIM'].fillna(data['SIM'].median())
-# data=data.fillna(data.mean())
-# #print(data.isna().sum())       #cek ada berapa data yang null
+datatrain.drop(['id','Tertarik'],axis=1,inplace=True) # kolom id dan tertarik tidak dibutuhkan 
+#print(datatrain)
 
-# # fig,ax= plt.subplots(ncols=3,figsize=(16,4))
-# # sns.boxplot(y='Premi',data3=data,ax=ax[0])
-# # sns.boxplot(y='Lama_Berlangganan',data3=data,ax=ax[1])
-# # sns.boxplot(y='Kanal_Penjualan',data3=data,ax=ax[2])
-# # plt.show()
+datatrain=datatrain.drop_duplicates() #drop data duplikasi karena bisa mengganggu proses
 
-# q1=data['Premi'].quantile(0.25)
-# q3=data['Premi'].quantile(0.75)
-# iqr=q3-q1
+def encoding(dataenc): #mengubah data menjadi numerik agar perhitungan menjadi lebih mudah
+    dataenc['Jenis_Kelamin']=dataenc['Jenis_Kelamin'].replace(['Pria','Wanita'],[1,0])
+    dataenc['Umur_Kendaraan']=dataenc['Umur_Kendaraan'].replace(['< 1 Tahun','1-2 Tahun','> 2 Tahun'],[0,1,2])
+    dataenc['Kendaraan_Rusak']=dataenc['Kendaraan_Rusak'].replace(['Tidak','Pernah'],[0,1])   
+encoding(datatrain)
+# print(datatrain.isnull().sum()) #cek ada berapa data yang null
+# print(datatrain.skew()) #cek skewness 
 
-# bb=q1-(1.5*iqr)
-# ba=q3+(1.5*iqr)
+datatrain['SIM']=datatrain['SIM'].fillna(datatrain['SIM'].median())
+datatrain=datatrain.fillna(datatrain.mean())
+#print(data.isna().sum())       #cek untuk memastikan data tidak ada yang null
 
-# print("ba: ",ba)
-# print("bb: ",bb)
-
-# data=data[~( (data['Premi']< bb ) | (data['Premi']>ba))]
-# fig,ax= plt.subplots(ncols=3,figsize=(16,4))
-# sns.boxplot(y='Premi',data=data,ax=ax[0])
-# sns.boxplot(y='Lama_Berlangganan',data=data,ax=ax[1])
-# sns.boxplot(y='Kanal_Penjualan',data=data,ax=ax[2])
+# fig,ax= plt.subplots(ncols=3,figsize=(7,7))
+# sns.boxplot(y='Premi',data=datatrain,ax=ax[0])
+# sns.boxplot(y='Kanal_Penjualan',data=datatrain,ax=ax[1])
+# sns.boxplot(y='Lama_Berlangganan',data=datatrain,ax=ax[2])
 # plt.show()
 
-# numeric=['Jenis_Kelamin','Umur','SIM','Kode_Daerah','Sudah_Asuransi'
-# ,'Umur_Kendaraan','Kendaraan_Rusak','Premi','Kanal_Penjualan','Lama_Berlangganan']
-# scaler= StandardScaler()
-# data[numeric]=scaler.fit_transform(data[numeric].values)
+q1=datatrain['Premi'].quantile(0.25)
+q3=datatrain['Premi'].quantile(0.75)
+iqr=q3-q1
 
-# # data.to_csv('cobakuy.csv',index=False)
+batasbawah=q1-(1.5*iqr)
+batasatas=q3+(1.5*iqr)
 
+datatrain=datatrain[~( (datatrain['Premi']< batasbawah ) | (datatrain['Premi']>batasatas))]#data selain
+# dalam range batas bawah dan atas tidak akan dimasukkan 
 
+# fig,ax= plt.subplots(ncols=3,figsize=(7,7))
+# sns.boxplot(y='Premi',data=datatrain,ax=ax[0])
+# sns.boxplot(y='Lama_Berlangganan',data=datatrain,ax=ax[1])
+# sns.boxplot(y='Kanal_Penjualan',data=datatrain,ax=ax[2])
+# plt.show()
+
+allkolom=['Jenis_Kelamin','Umur','SIM','Kode_Daerah','Sudah_Asuransi'
+,'Umur_Kendaraan','Kendaraan_Rusak','Premi','Kanal_Penjualan','Lama_Berlangganan']# semua kolom dimasukkan 
+# untuk di normalisasi 
+normalisasi = StandardScaler() #panggil fungsi standardscaler untuk z score
+datatrain[allkolom]=normalisasi.fit_transform(datatrain[allkolom].values) #proses normalisasi data
+print(datatrain)
+# datatrain.to_csv('hasilprogress1.csv',index=False) # export hasil data ke csv
